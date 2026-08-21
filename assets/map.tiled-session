@@ -12,11 +12,11 @@
             "scaleInEditor": 5.5
         },
         "untitled.tmj": {
-            "scale": 2,
-            "selectedLayer": 0,
+            "scale": 3,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 167.5,
-                "y": 205
+                "x": 84,
+                "y": 285
             }
         },
         "untitled.tmx": {
@@ -31,7 +31,8 @@
     "last.imagePath": "C:/Users/Alex/Desktop/study/patience/assets",
     "map.lastUsedFormat": "json",
     "openFiles": [
-        "untitled.tmj"
+        "untitled.tmj",
+        "teto.tsx"
     ],
     "project": "map.tiled-project",
     "recentFiles": [
