@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "vertex_array.hpp"
+
 struct Vertex
 {
   float xy[2];
@@ -17,7 +19,7 @@ public:
   const int m_maxVertices{};
 
   VertexBuffer() = delete;
-  explicit VertexBuffer(int maxVertices);
+  VertexBuffer(VertexArray& vertexArray, int maxVertices);
   ~VertexBuffer();
 
   VertexBuffer(const VertexBuffer& other) = delete;
@@ -26,7 +28,6 @@ public:
   VertexBuffer& operator=(VertexBuffer&& other) = delete;
 
   void bind();
-  void addVertices(std::vector<Vertex> vertices);
 };
 
 #endif

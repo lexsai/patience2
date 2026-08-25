@@ -11,31 +11,21 @@
 
 #include "vertex_buffer.hpp"
 #include "vertex_array.hpp"
-#include "texture.hpp"
-
-struct Character
-{
-  Texture texture;
-  unsigned int width;
-  unsigned int height;
-  int bearingX;
-  int bearingY;
-  long advance;
-};
+// #include "texture.hpp"
+#include "font_atlas.hpp"
 
 class Shader;
 
 class Renderer
 {
+  std::unique_ptr<FontAtlas> m_fontAtlas{};
   std::unique_ptr<Shader> m_textShader{};
   std::unique_ptr<VertexArray> m_textVertexArray{};
   std::unique_ptr<VertexBuffer> m_textVertexBuffer{};
 
-  // std::vector<Vertex> m_textVertices{};
-  std::map<char, Character> m_characters{};
-
+  std::vector<Vertex> m_textVertices{};
   void initText();
-  // void addTextVertex(float x, float y, float u, float v);
+  void addTextVertex(Vertex vertex);
 public:
   Renderer();
   ~Renderer();
@@ -45,9 +35,8 @@ public:
   Renderer(Renderer&& other) = delete;
   Renderer& operator=(Renderer&& other) = delete;
 
-
   void drawText(std::string text, float x, float y);
-  // void drawEnd();
+  void drawEnd();
 };
 
 #endif

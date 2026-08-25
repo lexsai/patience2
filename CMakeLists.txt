@@ -23,7 +23,7 @@ target_sources(patience
     src/game_window.cpp
     src/renderer.cpp
     src/shader.cpp
-    src/texture.cpp
+    src/font_atlas.cpp
     src/vertex_array.cpp
     src/vertex_buffer.cpp
 )

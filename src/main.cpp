@@ -17,9 +17,12 @@ int main(int argc, char** argv)
     Window window{ 640, 480 };
     Renderer renderer{};
 
+    float fps = 0;
     bool running = true;
     while (running)
     {
+      uint64_t start = SDL_GetPerformanceCounter();
+
       SDL_Event event;
       while (SDL_PollEvent(&event)) {
         switch (event.type) {
@@ -33,7 +36,17 @@ int main(int argc, char** argv)
         std::string("the black stars which hang in the sky over Carcosa."), 
         0, 160
       );
-      window.swapBuffer();
+
+      renderer.drawText(
+        std::string("FPS: ") + std::to_string(fps), 
+        0, 320
+      );
+
+      renderer.drawEnd();
+      window.swapBuffer(); 
+
+      uint64_t end = SDL_GetPerformanceCounter();
+      fps = static_cast<float>(SDL_GetPerformanceFrequency()) / (end - start);
     };
   } 
   catch(const std::exception& exception) {

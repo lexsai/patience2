@@ -25,6 +25,14 @@ Window::Window(int width, int height)
     SDL_DestroyWindow(m_window);
     throw std::runtime_error("could not create GL context");
   }
+
+  if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+  {
+    throw std::runtime_error("could not load gl loader");
+  }
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 Window::~Window()
