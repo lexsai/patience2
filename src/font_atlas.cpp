@@ -11,13 +11,10 @@ FontAtlas::FontAtlas(const char *fontPath)
   FreeTypeContext font = loadFont(fontPath);
 
   glm::ivec2 atlasSize = determineAtlasSize(font);
-  SDL_Log("atlasSize %d %d", atlasSize.x, atlasSize.y);
 
   m_texture = allocateFontTexture(font, atlasSize.x, atlasSize.y);
-  SDL_Log("allocated texture %d", m_texture);
   loadFontTexture(m_texture, font, atlasSize.x, atlasSize.y);
 
-  SDL_Log("loaded texture");
   unloadFont(font);
 }
 
@@ -157,26 +154,26 @@ std::vector<Vertex> FontAtlas::generateTextVertices(
 
   for (char character : text)
   {
-    Glyph *g = &m_glyph_by_char.at(character);
+    Glyph g = m_glyph_by_char.at(character);
 
-    float xpos = x + g->bearing.x;
-    float ypos = y - (g->size.y - g->bearing.y);
+    float xpos = x + g.bearing.x;
+    float ypos = y - (g.size.y - g.bearing.y);
 
     // top right but tex coord is lower left to flipi -- flip y sign  
-    float left = g->topLeftUV.x;
-    float right = g->botRightUV.x;
-    float top = g->topLeftUV.y;
-    float bot = g->botRightUV.y;
+    float left = g.topLeftUV.x;
+    float right = g.botRightUV.x;
+    float top = g.topLeftUV.y;
+    float bot = g.botRightUV.y;
 
-    textVertices.push_back({xpos,            ypos + g->size.y, left, bot});
-    textVertices.push_back({xpos,            ypos,             left, top});
-    textVertices.push_back({xpos + g->size.x, ypos,            right, top});
+    textVertices.push_back({ xpos,            ypos + g.size.y, left, bot });
+    textVertices.push_back({ xpos,            ypos,             left, top });
+    textVertices.push_back({ xpos + g.size.x, ypos,            right, top });
 
-    textVertices.push_back({xpos,            ypos + g->size.y, left, bot});
-    textVertices.push_back({xpos + g->size.x,             ypos, right, top});
-    textVertices.push_back({xpos + g->size.x, ypos + g->size.y, right, bot});
+    textVertices.push_back({ xpos,            ypos + g.size.y, left, bot });
+    textVertices.push_back({ xpos + g.size.x,             ypos, right, top });
+    textVertices.push_back({ xpos + g.size.x, ypos + g.size.y, right, bot });
 
-    x += g->advance >> 6;
+    x += g.advance >> 6;
   }
   return textVertices;
 }

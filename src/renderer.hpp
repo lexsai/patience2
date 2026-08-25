@@ -11,8 +11,9 @@
 
 #include "vertex_buffer.hpp"
 #include "vertex_array.hpp"
-// #include "texture.hpp"
+#include "texture.hpp"
 #include "font_atlas.hpp"
+#include "sprite_atlas.hpp"
 
 class Shader;
 
@@ -22,10 +23,19 @@ class Renderer
   std::unique_ptr<Shader> m_textShader{};
   std::unique_ptr<VertexArray> m_textVertexArray{};
   std::unique_ptr<VertexBuffer> m_textVertexBuffer{};
-
   std::vector<Vertex> m_textVertices{};
+
+  std::unique_ptr<SpriteAtlas> m_spriteAtlas{};
+  std::unique_ptr<Shader> m_spriteShader{};
+  std::unique_ptr<VertexArray> m_spriteVertexArray{};
+  std::unique_ptr<VertexBuffer> m_spriteVertexBuffer{};
+  std::vector<Vertex> m_spriteVertices{};
+
+  void initSprite();
   void initText();
   void addTextVertex(Vertex vertex);
+
+  void addSpriteVertex(Vertex vertex);
 public:
   Renderer();
   ~Renderer();
@@ -36,7 +46,14 @@ public:
   Renderer& operator=(Renderer&& other) = delete;
 
   void drawText(std::string text, float x, float y);
+
+  // leave spriteHeight as 0
+  void drawSprite(
+    SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight);
   void drawEnd();
+
+  void renderText();
+  void renderSprites();
 };
 
 #endif

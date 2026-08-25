@@ -2,6 +2,7 @@
 
 #include "game_window.hpp"
 #include "renderer.hpp"
+#include "game.hpp"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -16,6 +17,9 @@ int main(int argc, char** argv)
   {
     Window window{ 640, 480 };
     Renderer renderer{};
+    Game game{};
+
+    UserCommand userCmd{};
 
     float fps = 0;
     bool running = true;
@@ -29,13 +33,16 @@ int main(int argc, char** argv)
           case SDL_EVENT_QUIT:
             running = false;
             break;
+          case SDL_EVENT_KEY_DOWN:
+            game.updateUserCmd(userCmd, event.key.scancode, true);
+            break;
+          case SDL_EVENT_KEY_UP:
+            game.updateUserCmd(userCmd, event.key.scancode, false);
+            break;
         }
       }
 
-      renderer.drawText(
-        std::string("the black stars which hang in the sky over Carcosa."), 
-        0, 160
-      );
+      game.update(userCmd, renderer);
 
       renderer.drawText(
         std::string("FPS: ") + std::to_string(fps), 

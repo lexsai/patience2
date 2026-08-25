@@ -10,10 +10,23 @@
 Renderer::Renderer()
 {
   initText();
+  initSprite();
 }
 
 Renderer::~Renderer()
 {
+}
+
+void Renderer::drawSprite(
+  SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight)
+{
+  std::vector<Vertex> vertices = m_spriteAtlas->generateSpriteVertices(
+    s, x, y, spriteWidth, spriteHeight
+  );
+  for (Vertex vertex: vertices)
+  {
+    addSpriteVertex(vertex);
+  }
 }
 
 void Renderer::drawText(std::string text, float x, float y)
@@ -30,6 +43,42 @@ void Renderer::drawEnd()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
 
+  renderSprites();
+  renderText();
+}
+
+void Renderer::renderSprites()
+{
+  m_spriteShader->use();
+  m_spriteVertexArray->bind();
+  m_spriteVertexBuffer->bind();
+  m_spriteAtlas->use();
+
+  glm::mat4 view = glm::mat4(1.0f);
+  glm::mat4 projection = glm::ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f);
+  glm::mat4 mvp = projection * view;
+  m_spriteShader->uniformMatrix4f("mvp", mvp);
+  m_spriteShader->uniformInt("uTexture", 0);
+
+  glBufferSubData(GL_ARRAY_BUFFER, 0, m_spriteVertices.size() * sizeof(Vertex), m_spriteVertices.data());
+  glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_spriteVertices.size()));
+
+  m_spriteVertices.clear();
+}
+
+void Renderer::initSprite()
+{
+  m_spriteAtlas = std::make_unique<SpriteAtlas>("assets/teto.png");
+  m_spriteShader = std::make_unique<Shader>(
+    "assets/shaders/sprite/vert.glsl", 
+    "assets/shaders/sprite/frag.glsl");
+  
+  m_spriteVertexArray = std::make_unique<VertexArray>();
+  m_spriteVertexBuffer = std::make_unique<VertexBuffer>(*m_spriteVertexArray, 999);
+}
+
+void Renderer::renderText()
+{
   m_textShader->use();
   m_textVertexArray->bind();
   m_textVertexBuffer->bind();
@@ -51,8 +100,8 @@ void Renderer::initText()
 {
   m_fontAtlas = std::make_unique<FontAtlas>("assets/LinLibertine_R.ttf");
   m_textShader = std::make_unique<Shader>(
-    "assets/shaders/vert.glsl", 
-    "assets/shaders/frag.glsl");
+    "assets/shaders/text/vert.glsl", 
+    "assets/shaders/text/frag.glsl");
   
   m_textVertexArray = std::make_unique<VertexArray>();
   m_textVertexBuffer = std::make_unique<VertexBuffer>(*m_textVertexArray, 999);
@@ -66,4 +115,13 @@ void Renderer::addTextVertex(Vertex vertex)
   }
 
   m_textVertices.push_back(vertex);
+}
+
+void Renderer::addSpriteVertex(Vertex vertex)
+{
+  if (m_spriteVertices.size() == m_spriteVertexBuffer->m_maxVertices)
+  {
+    drawEnd();
+  }
+  m_spriteVertices.push_back(vertex);
 }

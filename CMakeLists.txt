@@ -20,10 +20,12 @@ set_target_properties(patience PROPERTIES
 target_sources(patience
   PRIVATE
     src/main.cpp
+    src/game.cpp
     src/game_window.cpp
     src/renderer.cpp
     src/shader.cpp
     src/font_atlas.cpp
+    src/sprite_atlas.cpp
     src/vertex_array.cpp
     src/vertex_buffer.cpp
 )
