@@ -2,7 +2,9 @@
 #define PATIENCE_GAME_HPP
 
 #include <vector>
+
 #include "../renderer/renderer.hpp"
+#include "entities.hpp"
 
 struct UserCommand {
   bool forward;
@@ -10,31 +12,6 @@ struct UserCommand {
   bool left;
   bool right;
   bool test;
-};
-
-struct EntityId
-{
-  int generation;
-  size_t index;
-};
-
-enum class EntityType {
-  None, // reserved for invalid entity
-  Player,
-};
-
-struct Entity
-{
-  EntityId entityId{};
-
-  EntityType type{};
-  float x;
-  float y;
-
-  float vx;
-  float vy;
-
-  int index;
 };
 
 class Game

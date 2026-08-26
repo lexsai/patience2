@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "systems.hpp"
 
 Game::Game()
 {
@@ -7,33 +8,16 @@ Game::Game()
 
 Game::~Game()
 {
-
-}
-
-void updatePlayer(UserCommand& userCmd, Entity& player)
-{
-  if (userCmd.forward) {
-    player.vy = 5.0f;
-  }
-  if (userCmd.back) {
-    player.vy = -5.0f;
-  }
-  if (userCmd.left) {
-    player.vx = -5.0f;
-  }
-  if (userCmd.right) {
-    player.vx = 5.0f;
-  }
 }
 
 void Game::updateEntityLogic(UserCommand& userCmd)
 {
-  for (auto& entity: m_entities) 
+  for (auto& e: m_entities) 
   {
-    switch (entity.type)
+    switch (e.type)
     {
       case EntityType::Player:
-        updatePlayer(userCmd, entity);
+        updatePlayer(userCmd, e);
         break;
       default:
         break;
@@ -41,28 +25,18 @@ void Game::updateEntityLogic(UserCommand& userCmd)
   }
 }
 
-void updatePhysics(Game& game)
-{
-  for (auto& entity: game.m_entities)
-  {
-    entity.x += entity.vx;
-    entity.y += entity.vy;
-
-    entity.vx = 0;
-    entity.vy = 0;
-  }
-}
-
 void Game::updateSystems()
 {
   updatePhysics(*this);
+  updateAnimations(*this);
 }
 
 void Game::drawEntities(Renderer& r)
 {
-  for (const auto& entity: m_entities) 
+  for (const auto& e: m_entities) 
   {
-    r.drawSprite({{0, 72}, {16, 24}}, entity.x, entity.y, 48, 0);
+    // TODO: consider missing texture case. what do ? 
+    r.drawSprite(e.currentSprite, e.x, e.y, 48, 0);
   }
 }
 
@@ -78,7 +52,7 @@ void Game::drawHUD(Renderer& r)
   if (player)
   {
     r.drawText(
-      "X: " + std::to_string(player->x) + " | Y: " + std::to_string(player->y) + " | Generation: " + std::to_string(player->entityId.generation), 
+      "X: " + std::to_string(player->x) + " | Y: " + std::to_string(player->y) + " | Generation: " + std::to_string(player->id.generation), 
       0, 400
     );
   }
@@ -130,17 +104,27 @@ void Game::updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown
 
 EntityId Game::createEntity(EntityType type, float x, float y)
 {
-  int generation = m_nextGeneration++;
-  Entity entity{ { generation, m_entities.size() }, type, x, y };
-  m_entities.push_back(entity);
+  Entity e{};
+  e.id = { m_nextGeneration++, m_entities.size() };
+  e.type = type;
+  e.x = x;
+  e.y = y;
 
-  return entity.entityId;
+  switch (type)
+  {
+    case EntityType::Player:
+      setupPlayer(e);
+      break;
+  }
+
+  m_entities.push_back(e);
+  return e.id;
 }
 
 Entity* Game::getEntity(EntityId e)
 {
   Entity* entity = &m_entities[e.index];
-  if (entity->entityId.generation != e.generation)
+  if (entity->id.generation != e.generation)
   {
     return nullptr;
   }

@@ -47,7 +47,7 @@ public:
 
   void drawText(std::string text, float x, float y);
 
-  // leave spriteHeight as 0
+  // leave spriteHeight as 0 to scale automatically according to width 
   void drawSprite(
     SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight);
   void drawEnd();

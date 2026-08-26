@@ -23,6 +23,8 @@ target_sources(patience
     src/game_window.cpp
 
     src/game/game.cpp
+    src/game/player.cpp
+    src/game/systems.cpp
 
     src/renderer/renderer.cpp
     src/renderer/shader.cpp
