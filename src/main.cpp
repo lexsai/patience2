@@ -1,8 +1,8 @@
 #include <Windows.h>
 
 #include "game_window.hpp"
-#include "renderer.hpp"
-#include "game.hpp"
+#include "renderer/renderer.hpp"
+#include "game/game.hpp"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>

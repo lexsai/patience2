@@ -20,14 +20,16 @@ set_target_properties(patience PROPERTIES
 target_sources(patience
   PRIVATE
     src/main.cpp
-    src/game.cpp
     src/game_window.cpp
-    src/renderer.cpp
-    src/shader.cpp
-    src/font_atlas.cpp
-    src/sprite_atlas.cpp
-    src/vertex_array.cpp
-    src/vertex_buffer.cpp
+
+    src/game/game.cpp
+
+    src/renderer/renderer.cpp
+    src/renderer/shader.cpp
+    src/renderer/font_atlas.cpp
+    src/renderer/sprite_atlas.cpp
+    src/renderer/vertex_array.cpp
+    src/renderer/vertex_buffer.cpp
 )
 
 target_link_libraries(patience 
