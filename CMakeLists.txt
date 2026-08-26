@@ -24,6 +24,7 @@ target_sources(patience
 
     src/game/game.cpp
     src/game/player.cpp
+    src/game/sign.cpp
     src/game/systems.cpp
 
     src/renderer/renderer.cpp

@@ -4,10 +4,28 @@
 Game::Game()
 {
   m_player = createEntity(EntityType::Player, 160, 160);
+  createEntity(EntityType::Sign, 320, 320);
 }
 
 Game::~Game()
 {
+}
+
+void Game::update(UserCommand& userCmd, Renderer& r)
+{
+  if (!m_inDialogue)
+  {
+    // freeze game when in dialogue for now
+    updateEntityLogic(userCmd);
+    updateSystems();
+  }
+
+  updateHUD(userCmd);
+
+  drawHUD(r);
+  drawEntities(r);
+
+  resetUserCmd(userCmd);
 }
 
 void Game::updateEntityLogic(UserCommand& userCmd)
@@ -22,31 +40,37 @@ void Game::updateEntityLogic(UserCommand& userCmd)
       default:
         break;
     }
+
+    updateEntityAnimation(e);
+    updateEntityInteraction(e, *this, userCmd);
   }
 }
 
 void Game::updateSystems()
 {
   updatePhysics(*this);
-  updateAnimations(*this);
 }
 
 void Game::drawEntities(Renderer& r)
 {
   for (const auto& e: m_entities) 
   {
-    // TODO: consider missing texture case. what do ? 
-    r.drawSprite(e.currentSprite, e.x, e.y, 48, 0);
+    if (e.sprite.size.x == 0 || e.sprite.size.y == 0)
+    {
+      continue;
+    }
+    r.drawSprite(e.sprite, e.x, e.y, 48, 0);
+    r.drawSprite({{0,0}, {16, 16}}, e.x, e.y, 16, 0);
   }
 }
 
 void Game::drawHUD(Renderer& r)
 {
-  r.drawText(
-    std::string("the black stars which hang in the sky over Carcosa."), 
-    0, 160
-  );
-  r.drawSprite({{0, 72}, {16, 24}}, 0, 200, 48, 0);
+  // r.drawText(
+  //   std::string("the black stars which hang in the sky over Carcosa."), 
+  //   0, 160
+  // );
+  // r.drawSprite({{0, 72}, {16, 24}}, 0, 200, 48, 0);
 
   Entity* player = getEntity(m_player);
   if (player)
@@ -55,50 +79,74 @@ void Game::drawHUD(Renderer& r)
       "X: " + std::to_string(player->x) + " | Y: " + std::to_string(player->y) + " | Generation: " + std::to_string(player->id.generation), 
       0, 400
     );
+
+    // Entity* sign = &m_entities[1];
+    // r.drawText(
+    //   "X: " + std::to_string(sign->x) + " | Y: " + std::to_string(sign->y) + " | Generation: " + std::to_string(sign->id.generation), 
+    //   0, 440
+    // );
+  }
+
+  if (m_inDialogue)
+  {
+    r.drawSprite({{0, 96}, {640, 120}}, 10, 10, 620, 150);
+    r.drawText(
+      m_dialogue.substr(0, m_dialogueProgress), 
+      50, 100
+    );
   }
 }
 
-void Game::update(UserCommand& userCmd, Renderer& r)
+void Game::updateHUD(UserCommand& userCmd)
 {
-  if (userCmd.test)
+  if (m_dialogueProgress < m_dialogue.length())
   {
-    removeEntity(m_player);
-    m_player = createEntity(EntityType::Player, 160, 160);
+    m_dialogueProgress++;
   }
-  userCmd.test = false;
 
-  updateEntityLogic(userCmd);
-  updateSystems();
+  if (userCmd.activate && m_dialogueProgress != m_dialogue.length())
+  {
+    m_dialogueProgress = m_dialogue.length();
+  }
+  else if (userCmd.activate && m_dialogueProgress == m_dialogue.length())
+  // if (userCmd.activate)
+  {
+    m_dialogue = "";
+    m_dialogueProgress = 0;
+    m_inDialogue = false;
+  }
+}
 
-  drawHUD(r);
-  drawEntities(r);
+void Game::resetUserCmd(UserCommand& userCmd)
+{
+  userCmd.activate = false;
 }
 
 void Game::updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown)
 {
   switch (keyCode) {
-    case SDL_SCANCODE_W: {
+    case SDL_SCANCODE_W:
       userCmd.forward = isDown;
-    } break;
+      break;
 
-    case SDL_SCANCODE_S: {
+    case SDL_SCANCODE_S:
       userCmd.back = isDown;
-    } break;
+      break;
     
-    case SDL_SCANCODE_A: {
+    case SDL_SCANCODE_A:
       userCmd.left = isDown;
-    } break;
+      break;
 
-    case SDL_SCANCODE_D: {
+    case SDL_SCANCODE_D:
       userCmd.right = isDown;
-    } break;
+      break;
 
-    case SDL_SCANCODE_R: {
-      if (!isDown)
+    case SDL_SCANCODE_R:
+      if (isDown)
       {
-        userCmd.test = true;
+        userCmd.activate = true;
       }
-    } break;
+      break;
   }
 }
 
@@ -114,6 +162,9 @@ EntityId Game::createEntity(EntityType type, float x, float y)
   {
     case EntityType::Player:
       setupPlayer(e);
+      break;
+    case EntityType::Sign:
+      setupSign(e);
       break;
   }
 
@@ -135,4 +186,11 @@ Entity* Game::getEntity(EntityId e)
 void Game::removeEntity(EntityId e)
 {
   m_entities.erase(m_entities.begin() + e.index);
+}
+
+void Game::playDialogue(std::string text)
+{
+  m_inDialogue = true;
+  m_dialogue = text;
+  m_dialogueProgress = 0;
 }

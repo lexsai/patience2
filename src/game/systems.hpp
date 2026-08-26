@@ -4,6 +4,7 @@
 #include "game.hpp"
 
 void updatePhysics(Game& game);
-void updateAnimations(Game& game);
+void updateEntityAnimation(Entity& e);
+void updateEntityInteraction(Entity& e, Game& game, UserCommand& userCmd);
 
 #endif

@@ -67,6 +67,7 @@ std::map<std::string, std::vector<Frame>> playerAnimations
 
 void setupPlayer(Entity& e)
 {
+  e.hasAnimation = true;
   e.anim.animations = playerAnimations;
   e.anim.currentAnimation = "down_idle";
 }

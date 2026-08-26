@@ -15,6 +15,7 @@ enum class EntityType
 {
   None, // reserved for invalid entity
   Player,
+  Sign,
 };
 
 enum class Direction
@@ -42,20 +43,27 @@ struct Animation
 struct Entity
 {
   EntityId id;
-
   EntityType type;
+
   float x;
   float y;
 
   float vx;
   float vy;
 
-  SpriteAtlasSpecifier currentSprite;
+  SpriteAtlasSpecifier sprite;
+
   Direction direction;
+
+  bool hasAnimation;
   Animation anim;
+  
+  bool interactable;
 };
 
 void setupPlayer(Entity& e);
 void updatePlayer(UserCommand& userCmd, Entity& e);
+
+void setupSign(Entity& e);
 
 #endif

@@ -11,16 +11,21 @@ struct UserCommand {
   bool back;
   bool left;
   bool right;
-  bool test;
+  bool activate;
 };
 
 class Game
 {
   int m_nextGeneration{};
-  // m_colliders
+
+  bool m_inDialogue{};
+  std::string m_dialogue{};
+  size_t m_dialogueProgress{};
 
   void updateEntityLogic(UserCommand& userCmd);
   void updateSystems();
+
+  void updateHUD(UserCommand& userCmd);
 
   void drawEntities(Renderer& r);
   void drawHUD(Renderer& r);
@@ -33,10 +38,13 @@ public:
 
   void update(UserCommand& userCmd, Renderer& r);
   void updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown);
+  void resetUserCmd(UserCommand& userCmd);
 
   EntityId createEntity(EntityType type, float x, float y);
   Entity* getEntity(EntityId e);
   void removeEntity(EntityId e);
+
+  void playDialogue(std::string text);
 };
 
 #endif
