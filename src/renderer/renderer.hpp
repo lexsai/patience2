@@ -50,6 +50,7 @@ public:
   // leave spriteHeight as 0 to scale automatically according to width 
   void drawSprite(
     SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight);
+  void drawBegin();
   void drawEnd();
 
   void renderText();

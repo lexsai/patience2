@@ -1,10 +1,12 @@
 #ifndef PATIENCE_GAME_HPP
 #define PATIENCE_GAME_HPP
 
-#include <vector>
+#include <array>
 
 #include "../renderer/renderer.hpp"
 #include "entities.hpp"
+
+constexpr int MAX_ENTITIES = 1024;
 
 struct UserCommand {
   bool forward;
@@ -16,8 +18,6 @@ struct UserCommand {
 
 class Game
 {
-  int m_nextGeneration{};
-
   bool m_inDialogue{};
   std::string m_dialogue{};
   size_t m_dialogueProgress{};
@@ -30,7 +30,17 @@ class Game
   void drawEntities(Renderer& r);
   void drawHUD(Renderer& r);
 public:
-  std::vector<Entity> m_entities{};
+  std::array<Entity, MAX_ENTITIES> m_entities{};
+  
+  // free list for m_entities 
+  std::array<int, MAX_ENTITIES> m_nextFreeSlot{};
+  int m_freeListHead{};
+  
+  // keep these separate so we can reset entity state with copy assignment
+  // of default entity without messing up array state
+  std::array<bool, MAX_ENTITIES> m_allocated{};
+  std::array<int, MAX_ENTITIES> m_generation{};
+
   EntityId m_player{};
 
   Game();

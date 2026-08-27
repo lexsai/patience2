@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   {
     Window window{ 640, 480 };
     Renderer renderer{};
-    Game game{};
+    std::unique_ptr<Game> gamePtr{ new Game{} };
 
     UserCommand userCmd{};
 
@@ -34,15 +34,17 @@ int main(int argc, char** argv)
             running = false;
             break;
           case SDL_EVENT_KEY_DOWN:
-            game.updateUserCmd(userCmd, event.key.scancode, true);
+            gamePtr->updateUserCmd(userCmd, event.key.scancode, true);
             break;
           case SDL_EVENT_KEY_UP:
-            game.updateUserCmd(userCmd, event.key.scancode, false);
+            gamePtr->updateUserCmd(userCmd, event.key.scancode, false);
             break;
         }
       }
 
-      game.update(userCmd, renderer);
+      renderer.drawBegin();
+
+      gamePtr->update(userCmd, renderer);
 
       renderer.drawText(
         std::string("FPS: ") + std::to_string(fps), 

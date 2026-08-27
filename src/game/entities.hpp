@@ -8,12 +8,12 @@ struct UserCommand;
 struct EntityId
 {
   int generation;
-  size_t index;
+  int index;
 };
 
 enum class EntityType
 {
-  None, // reserved for invalid entity
+  Nil, 
   Player,
   Sign,
 };
@@ -36,10 +36,15 @@ struct Animation
 {
   float animationTime;
   int currentFrame;
+
+  // TODO: change to id reference in manager, bad to have heap alloc & ctor 
+  //        overhead for all entities
   std::map<std::string, std::vector<Frame>> animations;
   std::string currentAnimation;
 };
 
+// inspired by Anton Mikhailov's Large Array of Things system
+// https://www.youtube.com/watch?v=ShSGHb65f3M
 struct Entity
 {
   EntityId id;
@@ -59,6 +64,11 @@ struct Entity
   Animation anim;
   
   bool interactable;
+
+  explicit operator bool() const
+  {
+    return type != EntityType::Nil;
+  }
 };
 
 void setupPlayer(Entity& e);

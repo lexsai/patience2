@@ -20,6 +20,8 @@ Renderer::~Renderer()
 void Renderer::drawSprite(
   SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight)
 {
+  if (s.size.x == 0 || s.size.y == 0) return;
+
   std::vector<Vertex> vertices = m_spriteAtlas->generateSpriteVertices(
     s, x, y, spriteWidth, spriteHeight
   );
@@ -38,11 +40,14 @@ void Renderer::drawText(std::string text, float x, float y)
   }
 }
 
-void Renderer::drawEnd()
+void Renderer::drawBegin()
 {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
+}
 
+void Renderer::drawEnd()
+{
   renderSprites();
   renderText();
 }
@@ -74,7 +79,7 @@ void Renderer::initSprite()
     "assets/shaders/sprite/frag.glsl");
   
   m_spriteVertexArray = std::make_unique<VertexArray>();
-  m_spriteVertexBuffer = std::make_unique<VertexBuffer>(*m_spriteVertexArray, 999);
+  m_spriteVertexBuffer = std::make_unique<VertexBuffer>(*m_spriteVertexArray, 3000);
 }
 
 void Renderer::renderText()
@@ -111,7 +116,7 @@ void Renderer::addTextVertex(Vertex vertex)
 {
   if (m_textVertices.size() == m_textVertexBuffer->m_maxVertices)
   {
-    drawEnd();
+    renderText();
   }
 
   m_textVertices.push_back(vertex);
@@ -121,7 +126,7 @@ void Renderer::addSpriteVertex(Vertex vertex)
 {
   if (m_spriteVertices.size() == m_spriteVertexBuffer->m_maxVertices)
   {
-    drawEnd();
+    renderSprites();
   }
   m_spriteVertices.push_back(vertex);
 }

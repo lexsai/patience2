@@ -4,6 +4,8 @@ void updatePhysics(Game& game)
 {
   for (auto& e: game.m_entities)
   {
+    if (!game.m_allocated[e.id.index]) continue;
+
     e.x += e.vx;
     e.y += e.vy;
 
@@ -45,7 +47,7 @@ void updateEntityInteraction(Entity& e, Game& game, UserCommand& userCmd)
     SDL_Log("interacted!");
     // TODO: better way to prevent activate from insta closing the dialogue.
     userCmd.activate = false;
-    game.playDialogue("sign of the times.");
+    game.playDialogue("black stars hang in the heavens.");
   }
 }
 
