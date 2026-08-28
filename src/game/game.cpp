@@ -6,19 +6,12 @@
 
 Game::Game()
 {
-  m_freeListHead = 1;
-  for (int i = 1; i < MAX_ENTITIES - 1; i++)
-  {
-    m_nextFreeSlot[i] = i + 1;
-  }
-  // reserve m_entities[0] as nil entity
-  m_nextFreeSlot[MAX_ENTITIES - 1] = 0;
+  m_player = m_entityPool.createEntity(EntityType::Player, 160, 160);
+  m_entityPool.createEntity(EntityType::Sign, 320, 320);
 
-  m_player = createEntity(EntityType::Player, 160, 160);
-  createEntity(EntityType::Sign, 320, 320);
-  // EntityId m_test = createEntity(EntityType::Sign, 360, 320);
-  // removeEntity(m_test);
-  // createEntity(EntityType::Sign, 100, 320);
+  EntityId m_test = m_entityPool.createEntity(EntityType::Sign, 360, 320);
+  m_entityPool.removeEntity(m_test);
+  m_entityPool.createEntity(EntityType::Sign, 100, 320);
 
   setupPlayerAnimations(*this);
 }
@@ -52,22 +45,19 @@ void Game::update(UserCommand& userCmd, Renderer& r)
 
 void Game::updateEntityLogic(UserCommand& userCmd)
 {
-  for (int i = 1; i < MAX_ENTITIES; i++) 
+  for (auto& e: m_entityPool) 
   {
-    if (!m_allocated[i]) continue;
-
-    Entity *e = &m_entities[i];
-    switch (e->type)
+    switch (e.type)
     {
       case EntityType::Player:
-        updatePlayer(userCmd, *e);
+        updatePlayer(userCmd, e);
         break;
       default:
         break;
     }
 
-    updateEntityAnimation(*e, *this);
-    updateEntityInteraction(*e, *this, userCmd);
+    updateEntityAnimation(e, *this);
+    updateEntityInteraction(e, *this, userCmd);
   }
 }
 
@@ -78,26 +68,20 @@ void Game::updateSystems()
 
 void Game::drawEntities(Renderer& r)
 {
-  for (int i = 1; i < MAX_ENTITIES; i++) 
+  for (auto& e: m_entityPool) 
   {
-    if (!m_allocated[i]) continue;
-
-    Entity* e = &m_entities[i];
-    r.drawSprite(e->sprite, e->x, e->y, 48, 0);
-    r.drawSprite({{0,0}, {16, 16}}, e->x, e->y, 16, 0);
+    r.drawSprite(e.sprite, e.x, e.y, 48, 0);
+    r.drawSprite({{0,0}, {16, 16}}, e.x, e.y, 16, 0);
   }
 }
 
 void Game::drawHUD(Renderer& r)
 {
   int counter = 0;
-  for (int i = 1; i < MAX_ENTITIES; i++)
+  for (auto& e: m_entityPool)
   {
-    if (!m_allocated[i]) continue;
-
-    Entity* e = &m_entities[i];
     r.drawText(
-      "X: " + std::to_string(e->x) + " | Y: " + std::to_string(e->y) + " | Generation: " + std::to_string(e->id.generation) + " | index: " + std::to_string(e->id.index), 
+      "X: " + std::to_string(e.x) + " | Y: " + std::to_string(e.y) + " | Generation: " + std::to_string(e.id.generation) + " | index: " + std::to_string(e.id.index), 
       0, 440.0f - 40 * counter
     );
     counter++;
@@ -163,69 +147,6 @@ void Game::updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown
         userCmd.activate = true;
       }
       break;
-  }
-}
-
-EntityId Game::createEntity(EntityType type, float x, float y)
-{
-  int slot = m_freeListHead;
-  m_freeListHead = m_nextFreeSlot[slot];
-  
-  Entity* e = &m_entities.at(slot);
-  if (m_allocated[slot])
-  {
-    throw std::runtime_error("tried creating on allocated slot" + std::to_string(slot));
-  }
-  // prevent state from prev allocation from contaminating
-  *e = {};
-  m_allocated[slot] = true;
-
-  int generation = m_generation.at(slot)++;
-  e->id = { generation, slot };
-  e->type = type;
-  e->x = x;
-  e->y = y;
-
-  switch (type)
-  {
-    case EntityType::Player:
-      setupPlayer(*e);
-      break;
-    case EntityType::Sign:
-      setupSign(*e);
-      break;
-  }
-
-  return e->id;
-}
-
-Entity* Game::getEntity(EntityId e)
-{
-  Entity* entity = &m_entities[e.index];
-  if (entity->id.generation != e.generation || !m_allocated[e.index])
-  {
-    return &m_entities[0];
-  }
-
-  return entity;
-}
-
-void Game::removeEntity(EntityId e)
-{
-  if (e.index <= 0 || e.index >= MAX_ENTITIES) return;
-
-  Entity *entity = &m_entities[e.index];
-  if (entity->id.generation == e.generation)
-  {
-    if (e.index != entity->id.index)
-    {
-      throw std::runtime_error("inconsistent entity id state");
-    }
-
-    m_allocated[e.index] = false;
-
-    m_nextFreeSlot[e.index] = m_freeListHead;
-    m_freeListHead = e.index;
   }
 }
 

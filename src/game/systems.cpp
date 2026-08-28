@@ -2,17 +2,13 @@
 
 void updatePhysics(Game& game)
 {
-  for (int i = 1; i < MAX_ENTITIES; i++)
+  for (auto& e: game.m_entityPool)
   {
-    if (!game.m_allocated[i]) continue;
+    e.x += e.vx;
+    e.y += e.vy;
 
-    Entity *e = &game.m_entities[i];
-
-    e->x += e->vx;
-    e->y += e->vy;
-
-    e->vx = 0;
-    e->vy = 0;
+    e.vx = 0;
+    e.vy = 0;
   }
 }
 
@@ -20,7 +16,7 @@ void updateEntityInteraction(Entity& e, Game& game, UserCommand& userCmd)
 {
   if (!e.interactable || !userCmd.activate) return;
 
-  Entity* p = game.getEntity(game.m_player);
+  Entity* p = game.m_entityPool.getEntity(game.m_player);
   if (!p) return;
 
   float playerCenterX = p->x + 24;

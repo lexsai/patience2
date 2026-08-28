@@ -5,8 +5,7 @@
 
 #include "../renderer/renderer.hpp"
 #include "entities.hpp"
-
-constexpr int MAX_ENTITIES = 1024;
+#include "entity_pool.hpp"
 
 struct UserCommand {
   bool forward;
@@ -30,16 +29,7 @@ class Game
   void drawEntities(Renderer& r);
   void drawHUD(Renderer& r);
 public:
-  std::array<Entity, MAX_ENTITIES> m_entities{};
-  
-  // free list for m_entities 
-  std::array<int, MAX_ENTITIES> m_nextFreeSlot{};
-  int m_freeListHead{};
-  
-  // keep these separate so we can reset entity state with copy assignment
-  // of default entity without messing up array state
-  std::array<bool, MAX_ENTITIES> m_allocated{};
-  std::array<int, MAX_ENTITIES> m_generation{};
+  EntityPool m_entityPool{};
 
   std::map<std::string, std::vector<Frame>> animations;
 
@@ -51,10 +41,6 @@ public:
   void update(UserCommand& userCmd, Renderer& r);
   void updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown);
   void resetUserCmd(UserCommand& userCmd);
-
-  EntityId createEntity(EntityType type, float x, float y);
-  Entity* getEntity(EntityId e);
-  void removeEntity(EntityId e);
 
   void playDialogue(std::string text);
 };
