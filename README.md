@@ -4,10 +4,10 @@ change backing type to std array [x]
 fix entity deletion [x]
 use ZII because it seems cool ! [x]
 
-
 create an animation manager so that entities copied/created are not randomly allocating a map
+  - just moved animations to game
 
-likewise for dialogue 
+likewise for dialogue
 
 and static sprites
 

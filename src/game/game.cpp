@@ -16,9 +16,11 @@ Game::Game()
 
   m_player = createEntity(EntityType::Player, 160, 160);
   createEntity(EntityType::Sign, 320, 320);
-  EntityId m_test = createEntity(EntityType::Sign, 360, 320);
-  removeEntity(m_test);
-  createEntity(EntityType::Sign, 100, 320);
+  // EntityId m_test = createEntity(EntityType::Sign, 360, 320);
+  // removeEntity(m_test);
+  // createEntity(EntityType::Sign, 100, 320);
+
+  setupPlayerAnimations(*this);
 }
 
 Game::~Game()
@@ -50,21 +52,22 @@ void Game::update(UserCommand& userCmd, Renderer& r)
 
 void Game::updateEntityLogic(UserCommand& userCmd)
 {
-  for (auto& e: m_entities) 
+  for (int i = 1; i < MAX_ENTITIES; i++) 
   {
-    if (!m_allocated[e.id.index]) continue;
+    if (!m_allocated[i]) continue;
 
-    switch (e.type)
+    Entity *e = &m_entities[i];
+    switch (e->type)
     {
       case EntityType::Player:
-        updatePlayer(userCmd, e);
+        updatePlayer(userCmd, *e);
         break;
       default:
         break;
     }
 
-    updateEntityAnimation(e);
-    updateEntityInteraction(e, *this, userCmd);
+    updateEntityAnimation(*e, *this);
+    updateEntityInteraction(*e, *this, userCmd);
   }
 }
 
@@ -75,43 +78,30 @@ void Game::updateSystems()
 
 void Game::drawEntities(Renderer& r)
 {
-  for (const auto& e: m_entities) 
+  for (int i = 1; i < MAX_ENTITIES; i++) 
   {
-    if (!m_allocated[e.id.index]) continue;
-    r.drawSprite(e.sprite, e.x, e.y, 48, 0);
-    r.drawSprite({{0,0}, {16, 16}}, e.x, e.y, 16, 0);
+    if (!m_allocated[i]) continue;
+
+    Entity* e = &m_entities[i];
+    r.drawSprite(e->sprite, e->x, e->y, 48, 0);
+    r.drawSprite({{0,0}, {16, 16}}, e->x, e->y, 16, 0);
   }
 }
 
 void Game::drawHUD(Renderer& r)
 {
-  // r.drawText(
-  //   std::string("the black stars which hang in the sky over Carcosa."), 
-  //   0, 160
-  // );
-  // r.drawSprite({{0, 72}, {16, 24}}, 0, 200, 48, 0);
-
-  // Entity* player = getEntity(m_player);
-  // if (player)
-  // {
   int counter = 0;
-  for (auto& e: m_entities) 
+  for (int i = 1; i < MAX_ENTITIES; i++)
   {
-    if (!m_allocated[e.id.index]) continue;
+    if (!m_allocated[i]) continue;
 
+    Entity* e = &m_entities[i];
     r.drawText(
-      "X: " + std::to_string(e.x) + " | Y: " + std::to_string(e.y) + " | Generation: " + std::to_string(e.id.generation) + " | index: " + std::to_string(e.id.index), 
+      "X: " + std::to_string(e->x) + " | Y: " + std::to_string(e->y) + " | Generation: " + std::to_string(e->id.generation) + " | index: " + std::to_string(e->id.index), 
       0, 440.0f - 40 * counter
     );
     counter++;
   }
-
-    // Entity* sign = &m_entities[1];
-    // r.drawText(
-    //   "X: " + std::to_string(sign->x) + " | Y: " + std::to_string(sign->y) + " | Generation: " + std::to_string(sign->id.generation) + " | index: " + std::to_string(sign->id.index), 
-    //   0, 440
-    // );
-  // }
 
   if (m_inDialogue)
   {
@@ -181,7 +171,7 @@ EntityId Game::createEntity(EntityType type, float x, float y)
   int slot = m_freeListHead;
   m_freeListHead = m_nextFreeSlot[slot];
   
-  Entity *e = &m_entities.at(slot);
+  Entity* e = &m_entities.at(slot);
   if (m_allocated[slot])
   {
     throw std::runtime_error("tried creating on allocated slot" + std::to_string(slot));

@@ -41,6 +41,8 @@ public:
   std::array<bool, MAX_ENTITIES> m_allocated{};
   std::array<int, MAX_ENTITIES> m_generation{};
 
+  std::map<std::string, std::vector<Frame>> animations;
+
   EntityId m_player{};
 
   Game();

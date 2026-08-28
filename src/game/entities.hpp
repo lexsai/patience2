@@ -4,6 +4,7 @@
 #include "../renderer/renderer.hpp"
 
 struct UserCommand;
+class Game;
 
 struct EntityId
 {
@@ -32,17 +33,6 @@ struct Frame
   float duration;
 };
 
-struct Animation
-{
-  float animationTime;
-  int currentFrame;
-
-  // TODO: change to id reference in manager, bad to have heap alloc & ctor 
-  //        overhead for all entities
-  std::map<std::string, std::vector<Frame>> animations;
-  std::string currentAnimation;
-};
-
 // inspired by Anton Mikhailov's Large Array of Things system
 // https://www.youtube.com/watch?v=ShSGHb65f3M
 struct Entity
@@ -61,9 +51,15 @@ struct Entity
   Direction direction;
 
   bool hasAnimation;
-  Animation anim;
+  float animationTime;
+  int currentFrameIndex;
+
+  // TODO: change to id reference in manager, bad to have heap alloc & ctor 
+  //        overhead for all entities
+  std::string currentAnimation;
   
   bool interactable;
+  void (*onInteract)(Game&);
 
   explicit operator bool() const
   {
@@ -73,6 +69,7 @@ struct Entity
 
 void setupPlayer(Entity& e);
 void updatePlayer(UserCommand& userCmd, Entity& e);
+void setupPlayerAnimations(Game& game);
 
 void setupSign(Entity& e);
 

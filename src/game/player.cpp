@@ -4,7 +4,7 @@
 std::map<std::string, std::vector<Frame>> playerAnimations 
 {
   {
-    "down", 
+    "player_down", 
     {
       {{{0, 72}, {16, 24}}, 0.1f}, 
       {{{32, 72}, {16, 24}}, 0.1f},
@@ -13,7 +13,7 @@ std::map<std::string, std::vector<Frame>> playerAnimations
     }
   },
   {
-    "right", 
+    "player_right", 
     {
       {{{0, 48}, {16, 24}}, 0.1f},
       {{{16, 48}, {16, 24}}, 0.1f},
@@ -22,7 +22,7 @@ std::map<std::string, std::vector<Frame>> playerAnimations
     }
   },
   {
-    "left", 
+    "player_left", 
     {
       {{{0, 24}, {16, 24}}, 0.1f},
       {{{16, 24}, {16, 24}}, 0.1f},
@@ -31,7 +31,7 @@ std::map<std::string, std::vector<Frame>> playerAnimations
     }
   },
   {
-    "up",
+    "player_up",
     {
       {{{0, 0}, {16, 24}}, 0.1f},
       {{{16, 0}, {16, 24}}, 0.1f},
@@ -40,25 +40,25 @@ std::map<std::string, std::vector<Frame>> playerAnimations
     }
   },
   {
-    "down_idle",
+    "player_down_idle",
     {
       {{{0, 72}, {16, 24}}, 0.1f}
     }
   },
   {
-    "right_idle", 
+    "player_right_idle", 
     {
       {{{0, 48}, {16, 24}}, 0.1f}
     }
   },
   {
-    "left_idle", 
+    "player_left_idle", 
     {
       {{{0, 24}, {16, 24}}, 0.1f}
     }
   },
   {
-    "up_idle", 
+    "player_up_idle", 
     {
       {{{0, 0}, {16, 24}}, 0.1f}
     }
@@ -68,8 +68,7 @@ std::map<std::string, std::vector<Frame>> playerAnimations
 void setupPlayer(Entity& e)
 {
   e.hasAnimation = true;
-  e.anim.animations = playerAnimations;
-  e.anim.currentAnimation = "down_idle";
+  e.currentAnimation = "player_down_idle";
 }
 
 void updatePlayer(UserCommand& userCmd, Entity& e)
@@ -108,29 +107,35 @@ void updatePlayer(UserCommand& userCmd, Entity& e)
     e.direction = Direction::Down;
   }
 
-  std::string animation = "";
+  std::string animation = "player_";
   switch (e.direction)
   {
     case Direction::Up:
-      animation = "up";
+      animation += "up";
       break;
     case Direction::Left:
-      animation = "left";
+      animation += "left";
       break;
     case Direction::Right:
-      animation = "right";
+      animation += "right";
       break;
     case Direction::Down:
-      animation = "down";
+      animation += "down";
       break;
   }
   if (!(userCmd.forward || userCmd.back || userCmd.left || userCmd.right))
   {
     animation += "_idle";
   }
-  if (animation != e.anim.currentAnimation)
+  if (animation != e.currentAnimation)
   {
-    e.anim.currentFrame = 0;
-    e.anim.currentAnimation = animation;
+    e.currentFrameIndex = 0;
+    e.currentAnimation = animation;
   }
+}
+
+
+void setupPlayerAnimations(Game& game)
+{
+  game.animations.insert(playerAnimations.begin(), playerAnimations.end());
 }
