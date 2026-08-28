@@ -1,38 +1,23 @@
 #include "systems.hpp"
 #include "map.hpp"
 
-bool isColliding(Entity& e, Tilemap& tilemap)
+bool collidesWithEntity(Game& game, Entity& e)
 {
-  int leftTile = static_cast<int>(e.left()) / TILE_WIDTH;
-  int rightTile = static_cast<int>(e.right()) / TILE_WIDTH;
-  int topTile = static_cast<int>(e.top()) / TILE_WIDTH;
-  int bottomTile = static_cast<int>(e.bottom()) / TILE_WIDTH;
-
-  SDL_Log("left %d right %d top %d bot %d", leftTile, rightTile, topTile, bottomTile);
-
-  if (leftTile < 0) leftTile = 0;
-  if (rightTile < 0) rightTile = 0;
-  if (topTile < 0) topTile = 0;
-  if (bottomTile < 0) bottomTile = 0;
-
-  if (leftTile >= tilemap.width) leftTile = tilemap.width - 1;
-  if (rightTile >= tilemap.width) rightTile = tilemap.width - 1;
-  if (topTile >= tilemap.height) topTile = tilemap.height - 1;
-  if (bottomTile >= tilemap.height) topTile = tilemap.height - 1;
-
-  for (int x = leftTile; x <= rightTile; x++)
+  bool collides = false;
+  for (auto& other: game.m_entityPool)
   {
-    for (int y = bottomTile; y <= topTile; y++)
+    if (other.id == e.id) continue;
+
+    if (
+      e.left() < other.right() &&
+      e.right() > other.left() &&
+      e.bottom() < other.top() &&
+      e.top() > other.bottom())
     {
-      Tile t = tilemap.tiles[y][x];
-      if (t.solid)
-      {
-        return true;
-      }
+      collides = true;
     }
   }
-  SDL_Log("hm?");
-  return false;
+  return collides;
 }
 
 void updatePhysics(Game& game)
@@ -43,14 +28,15 @@ void updatePhysics(Game& game)
 
     float prevX = e.x; 
     e.x += e.vx;
-    if (isColliding(e, game.m_loadedMap.ground))
+
+    if (isColliding(game.m_loadedMap.ground, e) || collidesWithEntity(game, e))
     {
       e.x = prevX;
     }
 
     float prevY = e.y; 
     e.y += e.vy;
-    if (isColliding(e, game.m_loadedMap.ground))
+    if (isColliding(game.m_loadedMap.ground, e) || collidesWithEntity(game, e))
     {
       e.y = prevY;
     }

@@ -10,6 +10,11 @@ struct EntityId
 {
   int generation;
   int index;
+
+  bool operator==(EntityId& other)
+  {
+    return index == other.index && generation == other.generation;
+  }
 };
 
 enum class EntityType

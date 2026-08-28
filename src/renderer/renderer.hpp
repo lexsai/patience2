@@ -35,12 +35,18 @@ class Renderer
   std::vector<Vertex> m_spriteVertices{};
   int m_staticSpriteVertexCount{};
 
+  std::unique_ptr<VertexArray> m_hudSpriteVertexArray{};
+  std::unique_ptr<VertexBuffer> m_hudSpriteVertexBuffer{};
+  std::vector<Vertex> m_hudSpriteVertices{};
+
   void initSprite();
   void initText();
   void addTextVertex(Vertex vertex);
   void addSpriteVertex(Vertex vertex);
+  void addHudSpriteVertex(Vertex vertex);
 
 public:
+  glm::ivec2 m_camera{};
 
   Renderer();
   ~Renderer();
@@ -54,6 +60,8 @@ public:
   // leave spriteHeight as 0 to scale automatically according to width 
   void drawSprite(
     SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight);
+  void drawHudSprite(
+    SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight);
   void drawBegin();
   void drawEnd();
 
@@ -62,6 +70,7 @@ public:
 
   void renderText();
   void renderSprites();
+  void renderHudSprites();
 };
 
 #endif

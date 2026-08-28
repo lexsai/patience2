@@ -6,7 +6,7 @@
 
 Game::Game(Renderer& r)
 {
-  m_player = m_entityPool.createEntity(EntityType::Player, 300, 300);
+  m_player = m_entityPool.createEntity(EntityType::Player, 300, 100);
   m_entityPool.createEntity(EntityType::Sign, 300, 320);
 
   EntityId m_test = m_entityPool.createEntity(EntityType::Sign, 360, 320);
@@ -50,6 +50,9 @@ void Game::update(UserCommand& userCmd, Renderer& r)
     updateEntityLogic(userCmd);
     updateSystems();
   }
+
+  Entity* player = m_entityPool.getEntity(m_player);
+  r.m_camera = { player->x, player->y };
 
   updateHUD(userCmd);
 
@@ -124,7 +127,7 @@ void Game::drawHUD(Renderer& r)
 
   if (m_inDialogue)
   {
-    r.drawSprite({{0, 96}, {640, 120}}, 10, 10, 620, 150);
+    r.drawHudSprite({{0, 96}, {640, 120}}, 10, 10, 620, 150);
     r.drawText(
       m_dialogue.substr(0, m_dialogueProgress), 
       50, 100

@@ -32,12 +32,28 @@ void Renderer::drawSprite(
   }
 }
 
+void Renderer::drawHudSprite(
+  SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight)
+{
+  if (s.size.x == 0 || s.size.y == 0) return;
+
+  std::vector<Vertex> vertices = m_spriteAtlas->generateSpriteVertices(
+    s, x, y, spriteWidth, spriteHeight
+  );
+  for (Vertex vertex: vertices)
+  {
+    addHudSpriteVertex(vertex);
+  }
+}
+
 void Renderer::drawStaticSprite(
   SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight)
 {
   std::vector<Vertex> vertices = m_spriteAtlas->generateSpriteVertices(
     s, x, y, spriteWidth, spriteHeight);
 
+  m_spriteVertexArray->bind();
+  m_spriteVertexBuffer->bind();
   glBufferSubData(
     GL_ARRAY_BUFFER, 
     m_staticSpriteVertexCount * sizeof(Vertex), 
@@ -65,6 +81,7 @@ void Renderer::drawBegin()
 void Renderer::drawEnd()
 {
   renderSprites();
+  renderHudSprites();
   renderText();
 }
 
@@ -74,7 +91,10 @@ void Renderer::renderSprites()
   m_spriteAtlas->use();
 
   glm::mat4 view = glm::mat4(1.0f);
-  glm::mat4 projection = glm::ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f);
+  glm::mat4 projection = glm::ortho(
+    m_camera.x - 320.0f, m_camera.x + 320.0f,
+    m_camera.y - 240.0f, m_camera.y + 240.0f,
+    -1.0f, 1.0f);
   glm::mat4 mvp = projection * view;
   m_spriteShader->uniformMatrix4f("mvp", mvp);
   m_spriteShader->uniformInt("uTexture", 0);
@@ -92,6 +112,33 @@ void Renderer::renderSprites()
   m_spriteVertices.clear();
 }
 
+void Renderer::renderHudSprites()
+{
+  m_spriteShader->use();
+  m_spriteAtlas->use();
+
+  glm::mat4 view = glm::mat4(1.0f);
+  glm::mat4 projection = glm::ortho(
+    0.0f, 640.0f,
+    0.0f, 480.0f,
+    -1.0f, 1.0f);
+  glm::mat4 mvp = projection * view;
+  m_spriteShader->uniformMatrix4f("mvp", mvp);
+  m_spriteShader->uniformInt("uTexture", 0);
+
+  m_hudSpriteVertexArray->bind();
+  m_hudSpriteVertexBuffer->bind();
+  glBufferSubData(
+    GL_ARRAY_BUFFER, 
+    0, 
+    m_hudSpriteVertices.size() * sizeof(Vertex), 
+    m_hudSpriteVertices.data()
+  );
+  glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_hudSpriteVertices.size()));
+
+  m_hudSpriteVertices.clear();
+}
+
 void Renderer::initSprite()
 {
   m_spriteAtlas = std::make_unique<SpriteAtlas>("assets/teto.png");
@@ -101,6 +148,9 @@ void Renderer::initSprite()
   
   m_spriteVertexArray = std::make_unique<VertexArray>();
   m_spriteVertexBuffer = std::make_unique<VertexBuffer>(*m_spriteVertexArray, 30000);
+
+  m_hudSpriteVertexArray = std::make_unique<VertexArray>();
+  m_hudSpriteVertexBuffer = std::make_unique<VertexBuffer>(*m_hudSpriteVertexArray, 30000);
 }
 
 void Renderer::renderText()
@@ -138,9 +188,7 @@ void Renderer::addTextVertex(Vertex vertex)
   if (m_textVertices.size() == m_textVertexBuffer->m_maxVertices)
   {
     SDL_Log("notice: reached max text vertices, flushing buffers...");
-    // render both to maintain sprite order
-    renderSprites();
-    renderText();
+    drawEnd();
   }
 
   m_textVertices.push_back(vertex);
@@ -151,9 +199,17 @@ void Renderer::addSpriteVertex(Vertex vertex)
   if (m_spriteVertices.size() == m_spriteVertexBuffer->m_maxVertices)
   {
     SDL_Log("reached max sprites vertices, flushing buffers...");
-    // render both to maintain sprite order
-    renderSprites();
-    renderText();
+    drawEnd();
   }
   m_spriteVertices.push_back(vertex);
+}
+
+void Renderer::addHudSpriteVertex(Vertex vertex)
+{
+  if (m_hudSpriteVertices.size() == m_hudSpriteVertexBuffer->m_maxVertices)
+  {
+    SDL_Log("reached max sprites vertices, flushing buffers...");
+    drawEnd();
+  }
+  m_hudSpriteVertices.push_back(vertex);
 }

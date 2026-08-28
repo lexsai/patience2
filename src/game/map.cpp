@@ -41,7 +41,36 @@ Map loadMap(std::string_view path)
   SDL_Log("dim %d %d", map.ground.width, map.ground.height);
 
   // throw std::runtime_error("lets stop here");
-  
-
   return map;
+}
+
+bool isColliding(Tilemap& tilemap, Entity& e)
+{
+  int leftTile = static_cast<int>(e.left()) / TILE_WIDTH;
+  int rightTile = static_cast<int>(e.right()) / TILE_WIDTH;
+  int topTile = static_cast<int>(e.top()) / TILE_WIDTH;
+  int bottomTile = static_cast<int>(e.bottom()) / TILE_WIDTH;
+
+  if (leftTile < 0) leftTile = 0;
+  if (rightTile < 0) rightTile = 0;
+  if (topTile < 0) topTile = 0;
+  if (bottomTile < 0) bottomTile = 0;
+
+  if (leftTile >= tilemap.width) leftTile = tilemap.width - 1;
+  if (rightTile >= tilemap.width) rightTile = tilemap.width - 1;
+  if (topTile >= tilemap.height) topTile = tilemap.height - 1;
+  if (bottomTile >= tilemap.height) topTile = tilemap.height - 1;
+
+  for (int x = leftTile; x <= rightTile; x++)
+  {
+    for (int y = bottomTile; y <= topTile; y++)
+    {
+      Tile t = tilemap.tiles[y][x];
+      if (t.solid)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
 }

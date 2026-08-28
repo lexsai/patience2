@@ -2,6 +2,7 @@
 #define PATIENCE_MAP_HPP
 
 #include "../renderer/renderer.hpp"
+#include "entities.hpp"
 
 #include <vector>
 
@@ -22,7 +23,7 @@ struct Map {
   Tilemap ceiling;
 };
 
-// using Map = std::vector<Tile>;
 Map loadMap(std::string_view mapPath);
+bool isColliding(Tilemap& tilemap, Entity& e);
 
 #endif
