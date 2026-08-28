@@ -6,7 +6,7 @@ bool collidesWithEntity(Game& game, Entity& e)
   bool collides = false;
   for (auto& other: game.m_entityPool)
   {
-    if (other.id == e.id) continue;
+    if (!other.solid || other.id == e.id) continue;
 
     if (
       e.left() < other.right() &&

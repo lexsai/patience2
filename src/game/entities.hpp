@@ -58,6 +58,8 @@ struct Entity
 
   Direction direction;
 
+  bool solid;
+
   bool hasAnimation;
   float animationTime;
   int currentFrameIndex;
