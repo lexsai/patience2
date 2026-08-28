@@ -15,6 +15,9 @@
 #include "font_atlas.hpp"
 #include "sprite_atlas.hpp"
 
+constexpr int TILE_WIDTH = 48;
+
+struct Tile;
 class Shader;
 
 class Renderer
@@ -30,13 +33,15 @@ class Renderer
   std::unique_ptr<VertexArray> m_spriteVertexArray{};
   std::unique_ptr<VertexBuffer> m_spriteVertexBuffer{};
   std::vector<Vertex> m_spriteVertices{};
+  int m_staticSpriteVertexCount{};
 
   void initSprite();
   void initText();
   void addTextVertex(Vertex vertex);
-
   void addSpriteVertex(Vertex vertex);
+
 public:
+
   Renderer();
   ~Renderer();
 
@@ -46,12 +51,14 @@ public:
   Renderer& operator=(Renderer&& other) = delete;
 
   void drawText(std::string text, float x, float y);
-
   // leave spriteHeight as 0 to scale automatically according to width 
   void drawSprite(
     SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight);
   void drawBegin();
   void drawEnd();
+
+  void drawStaticSprite(
+    SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight);
 
   void renderText();
   void renderSprites();

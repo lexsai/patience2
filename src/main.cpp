@@ -17,7 +17,7 @@ int main(int argc, char** argv)
   {
     Window window{ 640, 480 };
     Renderer renderer{};
-    std::unique_ptr<Game> gamePtr{ new Game{} };
+    std::unique_ptr<Game> gamePtr{ new Game{ renderer } };
 
     UserCommand userCmd{};
 
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 
       renderer.drawText(
         std::string("FPS: ") + std::to_string(fps), 
-        0, 320
+        0, 0
       );
 
       renderer.drawEnd();

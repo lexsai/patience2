@@ -23,7 +23,7 @@ EntityId EntityPool::createEntity(EntityType type, float x, float y)
   {
     throw std::runtime_error("tried creating on allocated slot" + std::to_string(slot));
   }
-  // prevent state from prev allocation from contaminating
+  // prevent state from prev allocation contaminating
   *e = {};
   m_allocated[slot] = true;
 
@@ -32,6 +32,8 @@ EntityId EntityPool::createEntity(EntityType type, float x, float y)
   e->type = type;
   e->x = x;
   e->y = y;
+  e->width = TILE_WIDTH;
+  e->height = TILE_WIDTH;
 
   setupEntity(*e);
 

@@ -1,6 +1,7 @@
 #include "renderer.hpp"
 #include "shader.hpp"
 #include "vertex_array.hpp"
+#include "../game/map.hpp"
 
 #include <stdexcept>
 
@@ -31,6 +32,21 @@ void Renderer::drawSprite(
   }
 }
 
+void Renderer::drawStaticSprite(
+  SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight)
+{
+  std::vector<Vertex> vertices = m_spriteAtlas->generateSpriteVertices(
+    s, x, y, spriteWidth, spriteHeight);
+
+  glBufferSubData(
+    GL_ARRAY_BUFFER, 
+    m_staticSpriteVertexCount * sizeof(Vertex), 
+    vertices.size() * sizeof(Vertex), 
+    vertices.data()
+  );
+  m_staticSpriteVertexCount += static_cast<int>(vertices.size());
+}
+
 void Renderer::drawText(std::string text, float x, float y)
 {
   std::vector<Vertex> vertices = m_fontAtlas->generateTextVertices(text, x, y);
@@ -55,8 +71,6 @@ void Renderer::drawEnd()
 void Renderer::renderSprites()
 {
   m_spriteShader->use();
-  m_spriteVertexArray->bind();
-  m_spriteVertexBuffer->bind();
   m_spriteAtlas->use();
 
   glm::mat4 view = glm::mat4(1.0f);
@@ -65,8 +79,15 @@ void Renderer::renderSprites()
   m_spriteShader->uniformMatrix4f("mvp", mvp);
   m_spriteShader->uniformInt("uTexture", 0);
 
-  glBufferSubData(GL_ARRAY_BUFFER, 0, m_spriteVertices.size() * sizeof(Vertex), m_spriteVertices.data());
-  glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_spriteVertices.size()));
+  m_spriteVertexArray->bind();
+  m_spriteVertexBuffer->bind();
+  glBufferSubData(
+    GL_ARRAY_BUFFER, 
+    m_staticSpriteVertexCount * sizeof(Vertex), 
+    m_spriteVertices.size() * sizeof(Vertex), 
+    m_spriteVertices.data()
+  );
+  glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(m_spriteVertices.size() + m_staticSpriteVertexCount));
 
   m_spriteVertices.clear();
 }

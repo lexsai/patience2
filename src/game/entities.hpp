@@ -46,6 +46,9 @@ struct Entity
   float vx;
   float vy;
 
+  float width;
+  float height;
+
   SpriteAtlasSpecifier sprite;
 
   Direction direction;
@@ -65,6 +68,11 @@ struct Entity
   {
     return type != EntityType::Nil;
   }
+ 
+  float left() { return x; }
+  float right() { return x + width; }
+  float top() { return y + height; }
+  float bottom() { return y; }
 };
 
 void updateEntity(Entity& e, UserCommand& userCmd);

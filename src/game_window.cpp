@@ -13,7 +13,7 @@ Window::Window(int width, int height)
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
-  m_window = SDL_CreateWindow("test", 640, 480, SDL_WINDOW_OPENGL);
+  m_window = SDL_CreateWindow("hm?", 640, 480, SDL_WINDOW_OPENGL);
   if (!m_window)
   {
     throw std::runtime_error("could not init sdl window");

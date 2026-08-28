@@ -4,9 +4,9 @@
 #include <stdexcept>
 #include <cstring>
 
-Game::Game()
+Game::Game(Renderer& r)
 {
-  m_player = m_entityPool.createEntity(EntityType::Player, 160, 160);
+  m_player = m_entityPool.createEntity(EntityType::Player, 300, 300);
   m_entityPool.createEntity(EntityType::Sign, 300, 320);
 
   EntityId m_test = m_entityPool.createEntity(EntityType::Sign, 360, 320);
@@ -17,6 +17,20 @@ Game::Game()
   m_entityPool.removeEntity(m_test);
 
   setupPlayerAnimations(*this);
+
+  m_loadedMap = loadMap("assets/map.txt");
+  for (int y = 0; y < m_loadedMap.ground.height; y++)
+  {
+    for (int x = 0; x< m_loadedMap.ground.width; x++)
+    {
+      Tile tile = m_loadedMap.ground.tiles[y][x];
+      r.drawStaticSprite(
+        tile.sprite, 
+        static_cast<float>(x) * TILE_WIDTH, 
+        static_cast<float>(y) * TILE_WIDTH, 
+        TILE_WIDTH, TILE_WIDTH);
+    }
+  }
 }
 
 Game::~Game()
@@ -27,8 +41,7 @@ void Game::update(UserCommand& userCmd, Renderer& r)
 {
   // if (userCmd.activate)
   // {
-  //   removeEntity(m_player);
-  //   m_player = createEntity(EntityType::Player, 160, 160);
+  //   m_entityPool.createEntity(EntityType::Player, 160, 160);
   // }
 
   if (!m_inDialogue)
@@ -41,6 +54,7 @@ void Game::update(UserCommand& userCmd, Renderer& r)
   updateHUD(userCmd);
 
   drawEntities(r);
+  drawCeiling(r);
   drawHUD(r);
 
   resetUserCmd(userCmd);
@@ -68,21 +82,44 @@ void Game::drawEntities(Renderer& r)
 {
   for (auto& e: m_entityPool) 
   {
-    r.drawSprite(e.sprite, e.x, e.y, 48, 0);
-    r.drawSprite({{0,0}, {16, 16}}, e.x, e.y, 16, 0);
+    r.drawSprite(e.sprite, e.x, e.y, e.width, 0);
+
+    if (m_debugMode)
+    {
+      r.drawSprite({{0,0}, {16, 16}}, e.x, e.y, 16, 0);
+    }
+  }
+}
+
+void Game::drawCeiling(Renderer& r)
+{
+  for (int y = 0; y < m_loadedMap.ceiling.height; y++)
+  {
+    for (int x = 0; x< m_loadedMap.ceiling.width; x++)
+    {
+      Tile tile = m_loadedMap.ceiling.tiles[y][x];
+      r.drawSprite(
+        tile.sprite, 
+        static_cast<float>(x) * TILE_WIDTH, 
+        static_cast<float>(y) * TILE_WIDTH, 
+        TILE_WIDTH, TILE_WIDTH);
+    }
   }
 }
 
 void Game::drawHUD(Renderer& r)
 {
-  int counter = 0;
-  for (auto& e: m_entityPool)
+  if (m_debugMode)
   {
-    r.drawText(
-      "X: " + std::to_string(e.x) + " | Y: " + std::to_string(e.y) + " | Generation: " + std::to_string(e.id.generation) + " | index: " + std::to_string(e.id.index), 
-      0, 440.0f - 40 * counter
-    );
-    counter++;
+    int counter = 0;
+    for (auto& e: m_entityPool)
+    {
+      r.drawText(
+        "X: " + std::to_string(e.x) + " | Y: " + std::to_string(e.y) + " | Generation: " + std::to_string(e.id.generation) + " | index: " + std::to_string(e.id.index), 
+        0, 440.0f - 40 * counter
+      );
+      counter++;
+    }
   }
 
   if (m_inDialogue)
@@ -97,6 +134,11 @@ void Game::drawHUD(Renderer& r)
 
 void Game::updateHUD(UserCommand& userCmd)
 {
+  if (userCmd.toggleDebug)
+  {
+    m_debugMode = !m_debugMode;
+  }
+
   if (m_dialogueProgress < m_dialogue.length())
   {
     m_dialogueProgress++;
@@ -117,6 +159,7 @@ void Game::updateHUD(UserCommand& userCmd)
 void Game::resetUserCmd(UserCommand& userCmd)
 {
   userCmd.activate = false;
+  userCmd.toggleDebug = false;
 }
 
 void Game::updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown)
@@ -139,10 +182,11 @@ void Game::updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown
       break;
 
     case SDL_SCANCODE_R:
-      if (isDown)
-      {
-        userCmd.activate = true;
-      }
+      if (isDown) userCmd.activate = true;
+      break;
+
+    case SDL_SCANCODE_U:
+      if (isDown) userCmd.toggleDebug = true;
       break;
   }
 }

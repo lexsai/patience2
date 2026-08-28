@@ -141,7 +141,7 @@ void FontAtlas::loadFontTexture(
     storedGlyph.bearing = glm::ivec2(glyph->bitmap_left, glyph->bitmap_top);
     storedGlyph.advance = glyph->advance.x;
 
-    m_glyph_by_char.insert({c, storedGlyph});
+    m_glyphByChar.insert({c, storedGlyph});
 
     xOffset += glyph->bitmap.width;
   }
@@ -154,7 +154,7 @@ std::vector<Vertex> FontAtlas::generateTextVertices(
 
   for (char character : text)
   {
-    Glyph g = m_glyph_by_char.at(character);
+    Glyph g = m_glyphByChar.at(character);
 
     float xpos = x + g.bearing.x;
     float ypos = y - (g.size.y - g.bearing.y);

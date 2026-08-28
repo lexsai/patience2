@@ -3,7 +3,6 @@
 
 // NOTE: keep all switches on EntityType in this file so we 
 //       dont lose track of them.
-
 void updateEntity(Entity& e, UserCommand& userCmd)
 {
   switch (e.type)

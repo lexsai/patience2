@@ -16,4 +16,7 @@ so more like an assetmanager
 if use multiple entity types (player struct, sign struct, etc. )
 separate object pool per 
 
-
+tilemap spec
+1. multiple layers
+2. generate vertices for all tiles on map on map load
+3.  

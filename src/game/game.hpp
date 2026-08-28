@@ -6,6 +6,7 @@
 #include "../renderer/renderer.hpp"
 #include "entities.hpp"
 #include "entity_pool.hpp"
+#include "map.hpp"
 
 struct UserCommand {
   bool forward;
@@ -13,10 +14,13 @@ struct UserCommand {
   bool left;
   bool right;
   bool activate;
+  bool toggleDebug;
 };
 
 class Game
 {
+  bool m_debugMode{};
+
   bool m_inDialogue{};
   std::string m_dialogue{};
   size_t m_dialogueProgress{};
@@ -27,6 +31,7 @@ class Game
   void updateHUD(UserCommand& userCmd);
 
   void drawEntities(Renderer& r);
+  void drawCeiling(Renderer& r);
   void drawHUD(Renderer& r);
 public:
   EntityPool m_entityPool{};
@@ -35,7 +40,9 @@ public:
 
   EntityId m_player{};
 
-  Game();
+  Map m_loadedMap{};
+
+  Game(Renderer& renderer);
   ~Game();
 
   void update(UserCommand& userCmd, Renderer& r);

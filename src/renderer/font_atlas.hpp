@@ -30,7 +30,7 @@ class FontAtlas
 {
   unsigned int m_texture{};
 
-  std::map<char, Glyph> m_glyph_by_char{};
+  std::map<char, Glyph> m_glyphByChar{};
 
   FreeTypeContext loadFont(const char *fontPath);
 

@@ -25,9 +25,10 @@ target_sources(patience
     src/game/game.cpp
     src/game/entity_pool.cpp
     src/game/entities.cpp
+    src/game/systems.cpp
+    src/game/map.cpp
     src/game/player.cpp
     src/game/sign.cpp
-    src/game/systems.cpp
 
     src/renderer/renderer.cpp
     src/renderer/shader.cpp

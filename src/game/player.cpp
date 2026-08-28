@@ -67,6 +67,8 @@ std::map<std::string, std::vector<Frame>> playerAnimations
 
 void setupPlayer(Entity& e)
 {
+  e.width = TILE_WIDTH;
+  e.height = TILE_WIDTH * 1.5f;
   e.hasAnimation = true;
   e.currentAnimation = "player_down_idle";
 }
