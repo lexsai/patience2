@@ -17,7 +17,7 @@ SpriteAtlas::SpriteAtlas(const char *imgPath)
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
   int width, height, nrChannels;
@@ -49,6 +49,10 @@ SpriteAtlas::~SpriteAtlas()
 std::vector<Vertex> SpriteAtlas::generateSpriteVertices(
   SpriteAtlasSpecifier s, float x, float y, float spriteWidth, float spriteHeight)
 {
+  // for pixel perfect rendering
+  x = std::round(x);
+  y = std::round(y);
+
   if (spriteHeight== 0)
   {
     spriteHeight = spriteWidth * (s.size.y / static_cast<float>(s.size.x));
