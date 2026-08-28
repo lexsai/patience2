@@ -59,6 +59,8 @@ struct Entity
   Direction direction;
 
   bool solid;
+  // kind of wack but fits with zii so
+  float colliderHeightReduction;
 
   bool hasAnimation;
   float animationTime;
@@ -76,9 +78,10 @@ struct Entity
     return type != EntityType::Nil;
   }
  
+  // for collisions
   float left() { return x; }
   float right() { return x + width; }
-  float top() { return y + height; }
+  float top() { return y + height * (1 - colliderHeightReduction); }
   float bottom() { return y; }
 };
 
