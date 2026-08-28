@@ -1,6 +1,8 @@
 #include "entities.hpp"
 #include "game.hpp"
 
+#include <glm/glm.hpp>
+
 std::map<std::string, std::vector<Frame>> playerAnimations 
 {
   {
@@ -75,39 +77,48 @@ void setupPlayer(Entity& e)
 
 void updatePlayer(UserCommand& userCmd, Entity& e)
 {
+  glm::vec2 movement{};
   if (userCmd.forward)
   {
-    e.vy = 5.0f;
+    movement.y = 1.0f;
   }
   if (userCmd.back)
   {
-    e.vy = -5.0f;
+    movement.y = -1.0f;
   }
   if (userCmd.left)
   {
-    e.vx = -5.0f;
+    movement.x = -1.0f;
   }
   if (userCmd.right)
   {
-    e.vx = 5.0f;
+    movement.x = 1.0f;
   }
 
-  if (e.vx > 0)
+  if (movement.x > 0)
   {
     e.direction = Direction::Right;
   }
-  else if (e.vx < 0) 
+  else if (movement.x < 0) 
   {
     e.direction = Direction::Left;
   } 
-  else if (e.vy > 0)
+  else if (movement.y > 0)
   {
     e.direction = Direction::Up;
   }
-  else if (e.vy < 0)
+  else if (movement.y < 0)
   {
     e.direction = Direction::Down;
   }
+
+  if (movement.x != 0 || movement.y != 0)
+  {
+    movement = glm::normalize(movement) * 4.0f;
+  }
+
+  e.vx = movement.x;
+  e.vy = movement.y;
 
   std::string animation = "player_";
   switch (e.direction)

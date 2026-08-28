@@ -27,6 +27,7 @@ class Game
 
   void updateEntityLogic(UserCommand& userCmd);
   void updateSystems();
+  void updateCamera(Renderer& r);
 
   void updateHUD(UserCommand& userCmd);
 

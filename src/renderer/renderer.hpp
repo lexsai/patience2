@@ -46,7 +46,7 @@ class Renderer
   void addHudSpriteVertex(Vertex vertex);
 
 public:
-  glm::ivec2 m_camera{};
+  glm::vec2 m_camera{};
 
   Renderer();
   ~Renderer();

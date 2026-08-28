@@ -51,8 +51,7 @@ void Game::update(UserCommand& userCmd, Renderer& r)
     updateSystems();
   }
 
-  Entity* player = m_entityPool.getEntity(m_player);
-  r.m_camera = { player->x, player->y };
+  updateCamera(r);
 
   updateHUD(userCmd);
 
@@ -61,6 +60,12 @@ void Game::update(UserCommand& userCmd, Renderer& r)
   drawHUD(r);
 
   resetUserCmd(userCmd);
+}
+
+void Game::updateCamera(Renderer& r)
+{
+  Entity* player = m_entityPool.getEntity(m_player);
+  r.m_camera = { player->x, player->y };
 }
 
 void Game::updateEntityLogic(UserCommand& userCmd)
