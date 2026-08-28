@@ -7,11 +7,14 @@
 Game::Game()
 {
   m_player = m_entityPool.createEntity(EntityType::Player, 160, 160);
-  m_entityPool.createEntity(EntityType::Sign, 320, 320);
+  m_entityPool.createEntity(EntityType::Sign, 300, 320);
 
   EntityId m_test = m_entityPool.createEntity(EntityType::Sign, 360, 320);
-  m_entityPool.removeEntity(m_test);
+  m_entityPool.createEntity(EntityType::Sign, 200, 320);
   m_entityPool.createEntity(EntityType::Sign, 100, 320);
+  m_entityPool.createEntity(EntityType::Sign, 100, 200);
+  m_entityPool.createEntity(EntityType::Sign, 100, 100);
+  m_entityPool.removeEntity(m_test);
 
   setupPlayerAnimations(*this);
 }
@@ -37,24 +40,19 @@ void Game::update(UserCommand& userCmd, Renderer& r)
 
   updateHUD(userCmd);
 
-  drawHUD(r);
   drawEntities(r);
+  drawHUD(r);
 
   resetUserCmd(userCmd);
 }
 
 void Game::updateEntityLogic(UserCommand& userCmd)
 {
+  // SDL_Log("test");
   for (auto& e: m_entityPool) 
   {
-    switch (e.type)
-    {
-      case EntityType::Player:
-        updatePlayer(userCmd, e);
-        break;
-      default:
-        break;
-    }
+    // SDL_Log("e %d", e.id.index);
+    updateEntity(e, userCmd);
 
     updateEntityAnimation(e, *this);
     updateEntityInteraction(e, *this, userCmd);
@@ -109,7 +107,6 @@ void Game::updateHUD(UserCommand& userCmd)
     m_dialogueProgress = m_dialogue.length();
   }
   else if (userCmd.activate && m_dialogueProgress == m_dialogue.length())
-  // if (userCmd.activate)
   {
     m_dialogue = "";
     m_dialogueProgress = 0;

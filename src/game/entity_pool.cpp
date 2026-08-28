@@ -33,15 +33,7 @@ EntityId EntityPool::createEntity(EntityType type, float x, float y)
   e->x = x;
   e->y = y;
 
-  switch (type)
-  {
-    case EntityType::Player:
-      setupPlayer(*e);
-      break;
-    case EntityType::Sign:
-      setupSign(*e);
-      break;
-  }
+  setupEntity(*e);
 
   return e->id;
 }

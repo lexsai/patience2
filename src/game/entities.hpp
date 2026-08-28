@@ -67,6 +67,9 @@ struct Entity
   }
 };
 
+void updateEntity(Entity& e, UserCommand& userCmd);
+void setupEntity(Entity& e);
+
 void setupPlayer(Entity& e);
 void updatePlayer(UserCommand& userCmd, Entity& e);
 void setupPlayerAnimations(Game& game);

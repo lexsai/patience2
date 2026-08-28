@@ -79,7 +79,7 @@ void Renderer::initSprite()
     "assets/shaders/sprite/frag.glsl");
   
   m_spriteVertexArray = std::make_unique<VertexArray>();
-  m_spriteVertexBuffer = std::make_unique<VertexBuffer>(*m_spriteVertexArray, 3000);
+  m_spriteVertexBuffer = std::make_unique<VertexBuffer>(*m_spriteVertexArray, 30000);
 }
 
 void Renderer::renderText()
@@ -109,13 +109,16 @@ void Renderer::initText()
     "assets/shaders/text/frag.glsl");
   
   m_textVertexArray = std::make_unique<VertexArray>();
-  m_textVertexBuffer = std::make_unique<VertexBuffer>(*m_textVertexArray, 999);
+  m_textVertexBuffer = std::make_unique<VertexBuffer>(*m_textVertexArray, 30000);
 }
 
 void Renderer::addTextVertex(Vertex vertex)
 {
   if (m_textVertices.size() == m_textVertexBuffer->m_maxVertices)
   {
+    SDL_Log("notice: reached max text vertices, flushing buffers...");
+    // render both to maintain sprite order
+    renderSprites();
     renderText();
   }
 
@@ -126,7 +129,10 @@ void Renderer::addSpriteVertex(Vertex vertex)
 {
   if (m_spriteVertices.size() == m_spriteVertexBuffer->m_maxVertices)
   {
+    SDL_Log("reached max sprites vertices, flushing buffers...");
+    // render both to maintain sprite order
     renderSprites();
+    renderText();
   }
   m_spriteVertices.push_back(vertex);
 }
