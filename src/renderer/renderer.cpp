@@ -8,8 +8,11 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-Renderer::Renderer()
+Renderer::Renderer(Window& window)
 {
+  m_windowWidth = static_cast<float>(window.m_width);
+  m_windowHeight = static_cast<float>(window.m_height);
+
   initText();
   initSprite();
 }
@@ -92,8 +95,8 @@ void Renderer::renderSprites()
 
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::ortho(
-    m_camera.x - 320.0f, m_camera.x + 320.0f,
-    m_camera.y - 240.0f, m_camera.y + 240.0f,
+    m_camera.x - m_windowWidth / 2, m_camera.x + m_windowWidth / 2,
+    m_camera.y - m_windowHeight / 2, m_camera.y + m_windowHeight / 2,
     -1.0f, 1.0f);
   glm::mat4 mvp = projection * view;
   m_spriteShader->uniformMatrix4f("mvp", mvp);
@@ -119,8 +122,8 @@ void Renderer::renderHudSprites()
 
   glm::mat4 view = glm::mat4(1.0f);
   glm::mat4 projection = glm::ortho(
-    0.0f, 640.0f,
-    0.0f, 480.0f,
+    0.0f, m_windowWidth,
+    0.0f, m_windowHeight,
     -1.0f, 1.0f);
   glm::mat4 mvp = projection * view;
   m_spriteShader->uniformMatrix4f("mvp", mvp);
@@ -161,7 +164,10 @@ void Renderer::renderText()
   m_fontAtlas->use();
 
   glm::mat4 view = glm::mat4(1.0f);
-  glm::mat4 projection = glm::ortho(0.0f, 640.0f, 0.0f, 480.0f, -1.0f, 1.0f);
+  glm::mat4 projection = glm::ortho(
+    0.0f, m_windowWidth, 
+    0.0f, m_windowHeight, 
+    -1.0f, 1.0f);
   glm::mat4 mvp = projection * view;
   m_textShader->uniformMatrix4f("mvp", mvp);
   m_textShader->uniformInt("uTexture", 0);

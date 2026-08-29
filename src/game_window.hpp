@@ -10,6 +10,9 @@ class Window
   SDL_GLContext m_glContext;
 
 public:
+  int m_width;
+  int m_height;
+
   Window();
   Window(int width, int height);
   ~Window();

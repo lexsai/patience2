@@ -15,11 +15,21 @@ struct UserCommand {
   bool right;
   bool activate;
   bool toggleDebug;
+  bool toggleEdit;
+  bool clickOnce;
+  bool click;
+  float mouseX;
+  float mouseY;
+  float worldMouseX;
+  float worldMouseY;
 };
 
 class Game
 {
   bool m_debugMode{};
+
+  bool m_editMode{};
+  int m_selectedTileId{};
 
   bool m_inDialogue{};
   std::string m_dialogue{};
@@ -33,7 +43,7 @@ class Game
 
   void drawEntities(Renderer& r);
   void drawCeiling(Renderer& r);
-  void drawHUD(Renderer& r);
+  void drawHUD(Renderer& r, UserCommand& userCmd);
 public:
   EntityPool m_entityPool{};
 
@@ -43,11 +53,20 @@ public:
 
   Map m_loadedMap{};
 
+  // yes we dupe this state but ill fix this when we add window resizing
+  float m_windowWidth{};
+  float m_windowHeight{};
+
   Game(Renderer& renderer);
   ~Game();
 
   void update(UserCommand& userCmd, Renderer& r);
-  void updateUserCmd(UserCommand& userCmd, SDL_Scancode keyCode, bool isDown);
+  void updateUserCmd(
+    UserCommand& userCmd, SDL_Scancode keyCode, bool isDown);
+  void updateUserCmdClick(
+    UserCommand& userCmd, bool isLeft, bool isDown);
+  void updateUserCmdMousePos(
+    UserCommand& userCmd, float mouseX, float mouseY);
   void resetUserCmd(UserCommand& userCmd);
 
   void playDialogue(std::string text);

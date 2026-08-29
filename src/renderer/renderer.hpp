@@ -14,6 +14,7 @@
 #include "texture.hpp"
 #include "font_atlas.hpp"
 #include "sprite_atlas.hpp"
+#include "../game_window.hpp"
 
 constexpr int TILE_WIDTH = 48;
 
@@ -46,9 +47,11 @@ class Renderer
   void addHudSpriteVertex(Vertex vertex);
 
 public:
+  float m_windowWidth{};
+  float m_windowHeight{};
   glm::ivec2 m_camera{};
 
-  Renderer();
+  Renderer(Window &window);
   ~Renderer();
 
   Renderer(const Renderer& other) = delete;

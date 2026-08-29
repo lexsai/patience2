@@ -147,7 +147,6 @@ void updatePlayer(UserCommand& userCmd, Entity& e)
   }
 }
 
-
 void setupPlayerAnimations(Game& game)
 {
   game.animations.insert(playerAnimations.begin(), playerAnimations.end());

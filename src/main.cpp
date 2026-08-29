@@ -15,8 +15,9 @@ int main(int argc, char** argv)
 {
   try
   {
-    Window window{ 640, 480 };
-    Renderer renderer{};
+    // Window window{ 640, 480 };
+    Window window{};
+    Renderer renderer{ window };
     std::unique_ptr<Game> gamePtr{ new Game{ renderer } };
 
     UserCommand userCmd{};
@@ -26,6 +27,10 @@ int main(int argc, char** argv)
     while (running)
     {
       uint64_t start = SDL_GetPerformanceCounter();
+
+      float mouseX, mouseY;
+      SDL_GetMouseState(&mouseX, &mouseY);
+      gamePtr->updateUserCmdMousePos(userCmd, mouseX, mouseY);
 
       SDL_Event event;
       while (SDL_PollEvent(&event)) {
@@ -38,6 +43,14 @@ int main(int argc, char** argv)
             break;
           case SDL_EVENT_KEY_UP:
             gamePtr->updateUserCmd(userCmd, event.key.scancode, false);
+            break;
+          case SDL_EVENT_MOUSE_BUTTON_DOWN:
+            gamePtr->updateUserCmdClick(userCmd, 
+              event.button.button == SDL_BUTTON_LEFT, true);
+            break;
+          case SDL_EVENT_MOUSE_BUTTON_UP:
+            gamePtr->updateUserCmdClick(userCmd, 
+              event.button.button == SDL_BUTTON_LEFT, false);
             break;
         }
       }
