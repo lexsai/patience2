@@ -41,6 +41,13 @@ Game::~Game()
 {
 }
 
+bool Game::isOnScreen(float wX, float wY)
+{
+  Entity* p = m_entityPool.getEntity(m_player);
+  return abs(p->x - wX) <= m_windowWidth / 2.0f + TILE_WIDTH && 
+    abs(p->y - wY) <= m_windowHeight / 2.0f + TILE_WIDTH;
+}
+
 void Game::update(UserCommand& userCmd, Renderer& r)
 {
   if (!m_inDialogue)
@@ -54,16 +61,22 @@ void Game::update(UserCommand& userCmd, Renderer& r)
 
   updateHUD(userCmd);
 
+  Entity* player = m_entityPool.getEntity(m_player);
   for (int y = 0; y < m_loadedMap.ground.height; y++)
   {
     for (int x = 0; x< m_loadedMap.ground.width; x++)
     {
       Tile tile = m_loadedMap.ground.tiles[y][x];
-      r.drawSprite(
-        tile.sprite, 
-        static_cast<float>(x) * TILE_WIDTH, 
-        static_cast<float>(y) * TILE_WIDTH, 
-        TILE_WIDTH, TILE_WIDTH);
+      float worldX = static_cast<float>(x) * TILE_WIDTH;
+      float worldY = static_cast<float>(y) * TILE_WIDTH;
+
+      if (isOnScreen(worldX, worldY))
+      {
+        r.drawSprite(
+          tile.sprite, 
+          worldX, worldY, 
+          TILE_WIDTH, TILE_WIDTH);
+      }
     }
   }
   drawEntities(r);

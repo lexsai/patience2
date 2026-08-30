@@ -70,6 +70,7 @@ public:
   void resetUserCmd(UserCommand& userCmd);
 
   void playDialogue(std::string text);
+  bool isOnScreen(float x, float y);
 };
 
 #endif
