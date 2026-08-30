@@ -165,7 +165,7 @@ void Game::drawHUD(Renderer& r, UserCommand& userCmd)
       }
       if (hudButton(r, userCmd, "export map", 0.0f, 0.0f))
       {
-        exportMap(m_loadedMap);
+        exportMap(m_loadedMap, "assets/map.txt");
       }
     hudEndContainer(r, userCmd);
 

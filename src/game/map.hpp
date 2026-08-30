@@ -39,7 +39,7 @@ struct Map {
 };
 
 Map loadMap(std::string_view mapPath);
-void exportMap(Map& map);
+void exportMap(Map& map, std::string_view path);
 bool isColliding(Tilemap& tilemap, Entity& e);
 glm::vec2 worldPosToTilePos(float wX, float wY);
 

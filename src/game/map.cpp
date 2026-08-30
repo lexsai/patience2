@@ -46,9 +46,9 @@ Map loadMap(std::string_view path)
   return map;
 }
 
-void exportMap(Map& map)
+void exportMap(Map& map, std::string_view path)
 {
-  std::ofstream output{ std::string("assets/map.txt") };
+  std::ofstream output{ std::string(path) };
   if (!output.is_open())
   {
     throw std::runtime_error("could not read file");
