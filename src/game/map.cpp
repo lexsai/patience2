@@ -40,9 +40,6 @@ Map loadMap(std::string_view path)
     std::cout << std::endl;
   }
 
-  SDL_Log("dim %d %d", map.ground.width, map.ground.height);
-
-  // throw std::runtime_error("lets stop here");
   return map;
 }
 
@@ -55,7 +52,6 @@ void exportMap(Map& map, std::string_view path)
   }
 
   output << map.ground.width << " " << map.ground.height << "\n\n";
-
   for (int y = map.ground.height - 1; y >= 0; y--)
   {
     for (int x = 0; x < map.ground.width; x++)
@@ -66,7 +62,6 @@ void exportMap(Map& map, std::string_view path)
   }
 
   output << "\n";
-
   for (int y = map.ceiling.height - 1; y >= 0; y--)
   {
     for (int x = 0; x < map.ceiling.width; x++)

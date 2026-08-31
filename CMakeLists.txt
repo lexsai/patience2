@@ -30,6 +30,7 @@ target_sources(patience
     src/game/map.cpp
     src/game/player.cpp
     src/game/sign.cpp
+    src/game/slime.cpp
 
     src/renderer/renderer.cpp
     src/renderer/shader.cpp

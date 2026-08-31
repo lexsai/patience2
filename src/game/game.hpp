@@ -8,7 +8,8 @@
 #include "entity_pool.hpp"
 #include "map.hpp"
 
-struct UserCommand {
+struct UserCommand
+{
   bool forward;
   bool back;
   bool left;
@@ -31,9 +32,10 @@ class Game
   bool m_editMode{};
   int m_selectedTileId{};
 
-  bool m_inDialogue{};
   std::string m_dialogue{};
   size_t m_dialogueProgress{};
+  
+  BattleState m_battleState{};
 
   void updateEntityLogic(UserCommand& userCmd);
   void updateSystems();
@@ -41,6 +43,8 @@ class Game
 
   void updateHUD(UserCommand& userCmd);
 
+  void drawBattle(Renderer& r);
+  void drawWorld(Renderer& r, UserCommand& userCmd);
   void drawEntities(Renderer& r);
   void drawCeiling(Renderer& r);
   void drawHUD(Renderer& r, UserCommand& userCmd);
@@ -70,6 +74,7 @@ public:
   void resetUserCmd(UserCommand& userCmd);
 
   void playDialogue(std::string text);
+  void startBattle(BattleState bs);
   bool isOnScreen(float x, float y);
 };
 

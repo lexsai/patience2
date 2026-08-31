@@ -15,6 +15,16 @@ void updateEntity(Entity& e, UserCommand& userCmd)
   }
 }
 
+void updateBattleState(EntityType type, BattleState& bs)
+{
+  switch (type)
+  {
+    case EntityType::Slime:
+      updateSlimeBattle(bs);
+      break;
+  }
+}
+
 void setupEntity(Entity& e)
 {
   switch (e.type)
@@ -25,6 +35,10 @@ void setupEntity(Entity& e)
     case EntityType::Sign:
       setupSign(e);
       break;
+    case EntityType::Slime:
+      setupSlime(e);
+      break;
   }
 }
+
 

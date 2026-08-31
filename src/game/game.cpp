@@ -20,6 +20,8 @@ Game::Game(Renderer& r)
   m_entityPool.createEntity(EntityType::Sign, 100, 100);
   m_entityPool.removeEntity(m_test);
 
+  m_entityPool.createEntity(EntityType::Slime, 400, 100);
+
   setupPlayerAnimations(*this);
 
   m_loadedMap = loadMap("assets/map.txt");
@@ -50,7 +52,15 @@ bool Game::isOnScreen(float wX, float wY)
 
 void Game::update(UserCommand& userCmd, Renderer& r)
 {
-  if (!m_inDialogue)
+  if (m_battleState.enemy != EntityType::Nil)
+  {
+    updateBattleState(m_battleState.enemy, m_battleState);
+    drawBattle(r);
+    resetUserCmd(userCmd);
+    return;
+  }
+
+  if (m_dialogue.empty())
   {
     // freeze game when in dialogue for now
     updateEntityLogic(userCmd);
@@ -58,31 +68,9 @@ void Game::update(UserCommand& userCmd, Renderer& r)
   }
 
   updateCamera(r);
-
   updateHUD(userCmd);
 
-  Entity* player = m_entityPool.getEntity(m_player);
-  for (int y = 0; y < m_loadedMap.ground.height; y++)
-  {
-    for (int x = 0; x< m_loadedMap.ground.width; x++)
-    {
-      Tile tile = m_loadedMap.ground.tiles[y][x];
-      float worldX = static_cast<float>(x) * TILE_WIDTH;
-      float worldY = static_cast<float>(y) * TILE_WIDTH;
-
-      if (isOnScreen(worldX, worldY))
-      {
-        r.drawSprite(
-          tile.sprite, 
-          worldX, worldY, 
-          TILE_WIDTH, TILE_WIDTH);
-      }
-    }
-  }
-  drawEntities(r);
-  drawCeiling(r);
-
-  drawHUD(r, userCmd);
+  drawWorld(r, userCmd);
 
   resetUserCmd(userCmd);
 }
@@ -109,6 +97,38 @@ void Game::updateEntityLogic(UserCommand& userCmd)
 void Game::updateSystems()
 {
   updatePhysics(*this);
+}
+
+void Game::drawWorld(Renderer& r, UserCommand& userCmd)
+{
+  Entity* player = m_entityPool.getEntity(m_player);
+  for (int y = 0; y < m_loadedMap.ground.height; y++)
+  {
+    for (int x = 0; x< m_loadedMap.ground.width; x++)
+    {
+      Tile tile = m_loadedMap.ground.tiles[y][x];
+      float worldX = static_cast<float>(x) * TILE_WIDTH;
+      float worldY = static_cast<float>(y) * TILE_WIDTH;
+
+      if (isOnScreen(worldX, worldY))
+      {
+        r.drawSprite(
+          tile.sprite, 
+          worldX, worldY, 
+          TILE_WIDTH, TILE_WIDTH);
+      }
+    }
+  }
+  drawEntities(r);
+  drawCeiling(r);
+
+  drawHUD(r, userCmd);
+}
+
+void Game::drawBattle(Renderer& r)
+{
+  r.drawText("IN BATTLE", 640, 480);
+  r.drawHudSprite({{0, 48}, {16, 24}}, 300, 400, 100, 0);
 }
 
 void Game::drawEntities(Renderer& r)
@@ -139,7 +159,6 @@ void Game::drawCeiling(Renderer& r)
     }
   }
 }
-
 
 void Game::drawHUD(Renderer& r, UserCommand& userCmd)
 {
@@ -205,7 +224,7 @@ void Game::drawHUD(Renderer& r, UserCommand& userCmd)
     }
   }
 
-  if (m_inDialogue)
+  if (!m_dialogue.empty())
   {
     r.drawHudSprite({{0, 96}, {640, 120}}, 344, 200, 620, 150);
     r.drawText(
@@ -240,7 +259,6 @@ void Game::updateHUD(UserCommand& userCmd)
   {
     m_dialogue = "";
     m_dialogueProgress = 0;
-    m_inDialogue = false;
   }
 }
 
@@ -311,7 +329,11 @@ void Game::updateUserCmdMousePos(
 
 void Game::playDialogue(std::string text)
 {
-  m_inDialogue = true;
   m_dialogue = text;
   m_dialogueProgress = 0;
+}
+
+void Game::startBattle(BattleState bs)
+{
+  m_battleState = bs;
 }

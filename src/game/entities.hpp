@@ -22,6 +22,7 @@ enum class EntityType
   Nil, 
   Player,
   Sign,
+  Slime,
 };
 
 enum class Direction
@@ -36,6 +37,14 @@ struct Frame
 {
   SpriteAtlasSpecifier sprite;
   float duration;
+};
+
+struct BattleState
+{
+  EntityType enemy;
+  float enemyHP;
+  float hp;
+  int turn;
 };
 
 // inspired by Anton Mikhailov's Large Array of Things system
@@ -85,6 +94,7 @@ struct Entity
   float bottom() { return y; }
 };
 
+void updateBattleState(EntityType type, BattleState& bs);
 void updateEntity(Entity& e, UserCommand& userCmd);
 void setupEntity(Entity& e);
 
@@ -93,5 +103,9 @@ void updatePlayer(UserCommand& userCmd, Entity& e);
 void setupPlayerAnimations(Game& game);
 
 void setupSign(Entity& e);
+
+void setupSlime(Entity& e);
+
+void updateSlimeBattle(BattleState& bs);
 
 #endif
